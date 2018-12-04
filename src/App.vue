@@ -52,6 +52,17 @@
                 <p v-else-if="$v.form.email.$error" class="error-message">Invalid email address</p>
             </div>
 
+            <div class="form-group github-username">
+                <label for="github-username">GitHub username:</label>
+                <!-- the lazy modifier will update models value when input looses focus -->
+                <input 
+                    :class="{error: shouldAppendErrorClass($v.form.githubUsername), valid: shouldAppendValidClass($v.form.githubUsername)}"
+                    v-model.lazy="$v.form.githubUsername.$model" 
+                    id="github-username">
+                <span v-show="$v.form.githubUsername.$pending" class="fa fa-spinner fa-spin"></span>
+                <p v-if="!$v.form.githubUsername.exists && $v.form.githubUsername.$error" class="error-message">There is not GitHub user with this username</p>
+            </div>
+
 
             <div class="form-group">
                 <label for="age">Pizza or Burger:</label>
@@ -83,7 +94,8 @@
                     age: null,
                     email: null,
                     food: null,
-                    newsletter: null
+                    newsletter: null,
+                    githubUsername: null,
                 }
             }
         },
@@ -108,6 +120,19 @@
                 },
                 food: {
                     pizzaOrBurger
+                },
+                githubUsername: {
+                    exists(value) {
+                        if (!helpers.req(value)) {
+                            return true
+                        }
+                        return axios.get(`//api.github.com/users/${value}`)
+                        // return new Promise((resolve, reject) => {
+                        //     setTimeout(() => {
+                        //         reject(value.length > 3)
+                        //     }, 1000);
+                        // })
+                    }
                 }
             }
         },
